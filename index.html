@@ -31,14 +31,14 @@
             width: 100%;
             height: 100%;
             z-index: 1000;
-            pointer-events: none; /* Cho phép click xuyên qua canvas */
+            pointer-events: none;
         }
         
         /* --- HÒM THƯ --- */
         .mailbox-container {
             position: absolute;
             cursor: pointer;
-            transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+            transition: transform 0.8s 0.5s ease-in-out, opacity 0.8s 0.5s ease-in-out; /* Thêm delay cho hiệu ứng biến mất */
             z-index: 20;
         }
         .mailbox {
@@ -69,7 +69,8 @@
             transform-origin: right;
             transition: transform 0.5s ease;
         }
-        .mailbox-container.clicked .mailbox-door {
+        /* Style khi cửa mở */
+        .mailbox-container.door-opened .mailbox-door {
             transform: rotateY(-110deg);
         }
         .mailbox-post {
@@ -97,6 +98,7 @@
             font-size: 18px;
             font-weight: 700;
             color: #c2185b;
+            transition: opacity 0.3s;
             animation: bounce 2s infinite;
         }
         @keyframes bounce {
@@ -104,10 +106,16 @@
             40% {transform: translateY(-10px);}
             60% {transform: translateY(-5px);}
         }
-        .mailbox-container.clicked {
+        /* Style khi hòm thư biến mất */
+        .mailbox-container.vanished {
             transform: scale(0);
             opacity: 0;
+            pointer-events: none;
         }
+        .mailbox-container.vanished .prompt-text {
+            opacity: 0;
+        }
+
 
         /* --- PHONG BÌ --- */
         .envelope-wrapper {
@@ -116,7 +124,7 @@
             z-index: 10;
             transform: scale(0);
             opacity: 0;
-            transition: transform 0.8s 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.5s 0.5s ease;
+            transition: transform 0.8s 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.5s 0.7s ease;
         }
         .envelope-wrapper.visible {
             transform: scale(1);
@@ -130,64 +138,26 @@
             border-radius: 10px;
         }
         .envelope::before, .envelope::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-style: solid;
+            content: ''; position: absolute; width: 0; height: 0; border-style: solid;
         }
-        .envelope::before {
-            border-width: 105px 160px;
-            border-color: #f8c8dc transparent transparent transparent;
-            top: 105px;
-        }
-        .envelope::after {
-            border-width: 105px 160px;
-            border-color: transparent transparent #f4a5c5 transparent;
-            bottom: 105px;
-        }
+        .envelope::before { border-width: 105px 160px; border-color: #f8c8dc transparent transparent transparent; top: 105px;}
+        .envelope::after { border-width: 105px 160px; border-color: transparent transparent #f4a5c5 transparent; bottom: 105px;}
+        
         .flap {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 105px;
-            background-color: #f4a5c5;
-            transform-origin: top;
-            transition: transform 0.6s 0.2s ease-in-out;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 105px; background-color: #f4a5c5;
+            transform-origin: top; transition: transform 0.6s 0.2s ease-in-out; border-top-left-radius: 10px; border-top-right-radius: 10px;
         }
         .letter {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.6s 0.2s ease-in-out, box-shadow 0.6s 0.2s ease-in-out;
-            padding: 10px;
-            border-radius: 10px;
+            position: absolute; top: 0; left: 0; right: 0; background: white; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.6s 0.2s ease-in-out, box-shadow 0.6s 0.2s ease-in-out; padding: 10px; border-radius: 10px;
         }
-        .envelope-wrapper.open .flap {
-            transform: rotateX(180deg);
-        }
-        .envelope-wrapper.open .letter {
-            transform: translateY(-120px) scale(1.1);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            z-index: 5;
-        }
-        .envelope-wrapper.open {
-            pointer-events: none;
-        }
+        .envelope-wrapper.open .flap { transform: rotateX(180deg); }
+        .envelope-wrapper.open .letter { transform: translateY(-120px) scale(1.1); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); z-index: 5;}
+        .envelope-wrapper.open { pointer-events: none; }
 
 
-        /* --- NỘI DUNG THIỆP MỜI (Styling bên trong thiệp) --- */
-        .invitation-card {
-            color: #5d4037;
-            text-align: center;
-            padding: 20px;
-        }
+        /* --- NỘI DUNG THIỆP MỜI --- */
+        .invitation-card { color: #5d4037; text-align: center; padding: 20px; }
         .header .icon { font-size: 40px; color: #e91e63; }
         .header h2 { font-weight: 500; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #d81b60; margin: 10px 0 0 0;}
         .header h1 { font-weight: 700; font-size: 20px; margin: 0; }
@@ -259,7 +229,6 @@
         </div>
     </div>
 
-    <!-- Script cho hiệu ứng -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
         const mailbox = document.getElementById('mailbox');
@@ -267,29 +236,52 @@
 
         // Bước 1: Nhấn vào hòm thư
         mailbox.addEventListener('click', () => {
-            mailbox.classList.add('clicked');
+            // 1. Thêm class để MỞ CỬA hòm thư
+            mailbox.classList.add('door-opened');
             
-            // Sau khi animation của hòm thư kết thúc, hiện phong bì lên
+            // 2. Sau khi cửa đã mở (khoảng 0.5s), thêm class để LÀM BIẾN MẤT hòm thư
+            setTimeout(() => {
+                mailbox.classList.add('vanished');
+            }, 500);
+
+            // 3. Cùng lúc hòm thư bắt đầu biến mất, kích hoạt để phong bì HIỆN RA
             setTimeout(() => {
                 envelope.classList.add('visible');
-            }, 500); // Thời gian này phải khớp với transition của mailbox
+            }, 500); 
         });
 
         // Bước 2: Nhấn vào phong bì để mở thư
         envelope.addEventListener('click', () => {
             envelope.classList.add('open');
-            setTimeout(launchConfetti, 800); // Tung hoa sau khi thiệp được kéo ra
+            setTimeout(launchConfetti, 800);
         });
 
-        // Hàm tung hoa và pháo giấy
         function launchConfetti() {
             const canvas = document.getElementById('confetti-canvas');
-            const myConfetti = confetti.create(canvas, {
-                resize: true,
-                useWorker: true
-            });
-
+            const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
             const duration = 5 * 1000;
             const end = Date.now() + duration;
-            
-            // Các ký tự hình hoa
+            const flowers = ['🌸', '🌺', '🌷', '💖', '✨'];
+
+            (function frame() {
+                myConfetti({
+                    particleCount: 5, angle: 60, spread: 55, origin: { x: 0 },
+                    colors: ['#f4a5c5', '#e91e63', '#ffffff', '#ffd700']
+                });
+                myConfetti({
+                    particleCount: 5, angle: 120, spread: 55, origin: { x: 1 },
+                    colors: ['#f4a5c5', '#e91e63', '#ffffff', '#ffd700']
+                });
+                myConfetti({
+                    particleCount: 2, angle: 90, spread: 360, ticks: 200, origin: { y: 0.6 },
+                    shapes: ['text'], shapeOptions: { text: { value: flowers, size: 30 } }, scalar: 2
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+</body>
+</html>
