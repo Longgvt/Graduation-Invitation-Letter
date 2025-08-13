@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thư mời Lễ Tốt Nghiệp của Đỗ Hương Quỳnh</title>
+    <title>Bạn có thư mời đặc biệt!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
@@ -19,201 +19,222 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden; /* Ngăn scroll khi hiệu ứng diễn ra */
+            overflow: hidden;
+            perspective: 1000px;
         }
 
-        /* --- Khung bao bọc hiệu ứng phong bì --- */
-        .envelope-wrapper {
-            position: relative;
-            cursor: pointer;
-        }
-
-        /* --- Phong bì --- */
-        .envelope {
-            position: relative;
-            width: 320px;
-            height: 210px;
-            background-color: #f8c8dc; /* Màu hồng nhạt của phong bì */
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.5s ease-in-out;
-        }
-
-        .envelope::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 10px;
-            background: linear-gradient(to bottom right, #f4a5c5, #f8c8dc);
-        }
-
-        /* --- Nắp phong bì --- */
-        .flap {
-            position: absolute;
+        /* --- Lớp phủ cho hiệu ứng --- */
+        #confetti-canvas {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 110px;
-            background-color: #f4a5c5; /* Màu nắp đậm hơn */
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            border-bottom-left-radius: 150px 20px;
-            border-bottom-right-radius: 150px 20px;
-            transform-origin: top;
-            transition: transform 0.6s ease-in-out;
-            z-index: 3;
-        }
-
-        /* --- Tấm thiệp bên trong --- */
-        .letter {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.6s 0.2s ease-in-out, box-shadow 0.6s 0.2s ease-in-out;
-            z-index: 1;
-        }
-
-        /* --- Hiệu ứng khi mở --- */
-        .envelope-wrapper.open .flap {
-            transform: rotateX(180deg);
-        }
-
-        .envelope-wrapper.open .letter {
-            transform: translateY(-150px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            z-index: 2;
-        }
-
-        .envelope-wrapper.open .click-prompt {
-            opacity: 0;
-            transform: translateY(20px);
+            height: 100%;
+            z-index: 1000;
+            pointer-events: none; /* Cho phép click xuyên qua canvas */
         }
         
-        /* --- Dòng chữ nhắc nhở --- */
-        .click-prompt {
-            margin-top: 20px;
-            font-size: 16px;
-            color: #d81b60;
-            font-weight: 500;
+        /* --- HÒM THƯ --- */
+        .mailbox-container {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+            z-index: 20;
+        }
+        .mailbox {
+            position: relative;
+            width: 200px;
+            height: 250px;
+        }
+        .mailbox-body {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 120px;
+            background: #f4a5c5;
+            border-radius: 10px;
+            border: 5px solid #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .mailbox-door {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 70px;
+            height: 50px;
+            background: #fff;
+            border-radius: 5px;
+            transform-origin: right;
+            transition: transform 0.5s ease;
+        }
+        .mailbox-container.clicked .mailbox-door {
+            transform: rotateY(-110deg);
+        }
+        .mailbox-post {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 130px;
+            background: #e91e63;
+        }
+        .mailbox-top {
+            position: absolute;
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 20px;
+            background: #e91e63;
+            border-radius: 10px 10px 0 0;
+        }
+        .prompt-text {
             text-align: center;
-            transition: all 0.5s ease;
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #c2185b;
             animation: bounce 2s infinite;
         }
-
         @keyframes bounce {
             0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
             40% {transform: translateY(-10px);}
             60% {transform: translateY(-5px);}
         }
-        
+        .mailbox-container.clicked {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        /* --- PHONG BÌ --- */
+        .envelope-wrapper {
+            position: absolute;
+            cursor: pointer;
+            z-index: 10;
+            transform: scale(0);
+            opacity: 0;
+            transition: transform 0.8s 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.5s 0.5s ease;
+        }
+        .envelope-wrapper.visible {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .envelope {
+            position: relative;
+            width: 320px;
+            height: 210px;
+            background-color: #f8c8dc;
+            border-radius: 10px;
+        }
+        .envelope::before, .envelope::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+        .envelope::before {
+            border-width: 105px 160px;
+            border-color: #f8c8dc transparent transparent transparent;
+            top: 105px;
+        }
+        .envelope::after {
+            border-width: 105px 160px;
+            border-color: transparent transparent #f4a5c5 transparent;
+            bottom: 105px;
+        }
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 105px;
+            background-color: #f4a5c5;
+            transform-origin: top;
+            transition: transform 0.6s 0.2s ease-in-out;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .letter {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.6s 0.2s ease-in-out, box-shadow 0.6s 0.2s ease-in-out;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .envelope-wrapper.open .flap {
+            transform: rotateX(180deg);
+        }
+        .envelope-wrapper.open .letter {
+            transform: translateY(-120px) scale(1.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            z-index: 5;
+        }
+        .envelope-wrapper.open {
+            pointer-events: none;
+        }
+
+
         /* --- NỘI DUNG THIỆP MỜI (Styling bên trong thiệp) --- */
         .invitation-card {
             color: #5d4037;
             text-align: center;
+            padding: 20px;
         }
+        .header .icon { font-size: 40px; color: #e91e63; }
+        .header h2 { font-weight: 500; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #d81b60; margin: 10px 0 0 0;}
+        .header h1 { font-weight: 700; font-size: 20px; margin: 0; }
+        .graduate-name { font-family: 'Dancing Script', cursive; font-size: 42px; color: #c2185b; margin: 10px 0 15px 0;}
+        .invitation-body p { font-size: 14px; line-height: 1.6; margin: 0; }
+        .greeting { font-weight: 700; margin-bottom: 10px !important; }
+        .divider { border: 0; height: 1px; background: #f48fb1; margin: 20px 0; }
+        .info-block h3 { margin: 0 0 10px 0; font-size: 16px; font-weight: 700; color: #ad1457; }
+        .info-block p, .info-block div { font-size: 13px; }
+        .date-time-grid { display: flex; justify-content: space-around; align-items: center; font-weight: 500;}
+        .date-number { font-size: 32px; font-weight: 700; color: #c2185b; line-height: 1;}
+        .location strong { display: block; margin-bottom: 4px; font-size: 14px; }
+        .closing-note { margin-top: 20px; font-style: italic; font-size: 14px; color: #d81b60; }
 
-        .header .icon {
-            font-size: 40px;
-            color: #e91e63;
-        }
-        .header h2 {
-            font-weight: 500;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #d81b60;
-            margin: 10px 0 0 0;
-        }
-        .header h1 {
-            font-weight: 700;
-            font-size: 20px;
-            margin: 0;
-        }
-        .graduate-name {
-            font-family: 'Dancing Script', cursive;
-            font-size: 42px;
-            color: #c2185b;
-            margin: 10px 0 15px 0;
-        }
-        .invitation-body p {
-            font-size: 14px;
-            line-height: 1.6;
-            margin: 0;
-        }
-        .greeting {
-            font-weight: 700;
-            margin-bottom: 10px !important;
-        }
-        .divider {
-            border: 0;
-            height: 1px;
-            background: #f48fb1;
-            margin: 20px 0;
-        }
-        .info-block h3 {
-            margin: 0 0 10px 0;
-            font-size: 16px;
-            font-weight: 700;
-            color: #ad1457;
-        }
-        .info-block p, .info-block div {
-            font-size: 13px;
-        }
-        .date-time-grid {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            font-weight: 500;
-        }
-        .date-number {
-            font-size: 32px;
-            font-weight: 700;
-            color: #c2185b;
-            line-height: 1;
-        }
-        .location strong {
-            display: block;
-            margin-bottom: 4px;
-            font-size: 14px;
-        }
-        .closing-note {
-            margin-top: 20px;
-            font-style: italic;
-            font-size: 14px;
-            color: #d81b60;
-        }
     </style>
 </head>
 <body>
+    <canvas id="confetti-canvas"></canvas>
 
-    <div class="envelope-wrapper">
+    <!-- Hòm thư -->
+    <div class="mailbox-container" id="mailbox">
+        <div class="mailbox">
+            <div class="mailbox-post"></div>
+            <div class="mailbox-body">
+                <div class="mailbox-door"></div>
+            </div>
+            <div class="mailbox-top"></div>
+        </div>
+        <p class="prompt-text">Bạn có thư!</p>
+    </div>
+
+    <!-- Phong bì và Thiệp mời -->
+    <div class="envelope-wrapper" id="envelope">
         <div class="envelope">
             <div class="letter">
-                <!-- Nội dung thiệp mời bắt đầu từ đây -->
                 <div class="invitation-card">
                     <header class="header">
                         <div class="icon"><i class="fas fa-graduation-cap"></i></div>
                         <h2>Trân trọng kính mời</h2>
                         <h1>Tham dự Lễ Tốt Nghiệp</h1>
                     </header>
-
                     <p class="graduate-name">Đỗ Hương Quỳnh</p>
-
                     <div class="invitation-body">
                         <p class="greeting">Dear: Long ❤️</p>
                         <p>Mình rất mong bạn có thể đến chung vui và chia sẻ khoảnh khắc ý nghĩa này cùng mình.</p>
                     </div>
-
                     <hr class="divider">
-                    
                     <div class="info-block">
                         <h3>Thời Gian</h3>
                         <div class="date-time-grid">
@@ -225,62 +246,50 @@
                             <div>09:00 AM</div>
                         </div>
                     </div>
-
                     <hr class="divider">
-                    
                     <div class="info-block location">
                         <h3><i class="fas fa-map-marker-alt"></i> Địa Điểm</h3>
                         <p><strong>Trường Đại học Kinh tế Quốc dân</strong></p>
                         <p>207 Giải Phóng, Đồng Tâm, Hai Bà Trưng, Hà Nội</p>
                     </div>
-
                     <p class="closing-note">Sự hiện diện của bạn là niềm vui lớn của mình!</p>
                 </div>
-                <!-- Kết thúc nội dung thiệp mời -->
             </div>
             <div class="flap"></div>
         </div>
-        <div class="click-prompt">Nhấn vào thư để mở</div>
     </div>
 
-    <!-- Script cho hiệu ứng pháo giấy -->
+    <!-- Script cho hiệu ứng -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
     <script>
-        const envelope = document.querySelector('.envelope-wrapper');
-        envelope.addEventListener('click', () => {
-            // Thêm class 'open' để kích hoạt animation CSS
-            envelope.classList.add('open');
+        const mailbox = document.getElementById('mailbox');
+        const envelope = document.getElementById('envelope');
 
-            // Đợi một chút để animation mở thư diễn ra rồi mới tung pháo giấy
-            setTimeout(launchConfetti, 600); 
+        // Bước 1: Nhấn vào hòm thư
+        mailbox.addEventListener('click', () => {
+            mailbox.classList.add('clicked');
+            
+            // Sau khi animation của hòm thư kết thúc, hiện phong bì lên
+            setTimeout(() => {
+                envelope.classList.add('visible');
+            }, 500); // Thời gian này phải khớp với transition của mailbox
         });
 
+        // Bước 2: Nhấn vào phong bì để mở thư
+        envelope.addEventListener('click', () => {
+            envelope.classList.add('open');
+            setTimeout(launchConfetti, 800); // Tung hoa sau khi thiệp được kéo ra
+        });
+
+        // Hàm tung hoa và pháo giấy
         function launchConfetti() {
-            const duration = 5 * 1000; // 5 giây
-            const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-            const colors = ['#f4a5c5', '#e91e63', '#ffffff', '#ffd700']; // Hồng, hồng đậm, trắng, vàng gold
+            const canvas = document.getElementById('confetti-canvas');
+            const myConfetti = confetti.create(canvas, {
+                resize: true,
+                useWorker: true
+            });
 
-            function randomInRange(min, max) {
-                return Math.random() * (max - min) + min;
-            }
-
-            const interval = setInterval(function() {
-                const timeLeft = animationEnd - Date.now();
-
-                if (timeLeft <= 0) {
-                    return clearInterval(interval);
-                }
-
-                const particleCount = 50 * (timeLeft / duration);
-                // Bắn từ bên trái
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: colors }));
-                // Bắn từ bên phải
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: colors }));
-            }, 250);
-        }
-    </script>
-
-</body>
-</html>
+            const duration = 5 * 1000;
+            const end = Date.now() + duration;
+            
+            // Các ký tự hình hoa
