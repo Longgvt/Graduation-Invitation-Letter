@@ -20,241 +20,211 @@
             min-height: 100vh;
             margin: 0;
             overflow: hidden;
-            perspective: 1000px;
         }
 
         /* --- Lớp phủ cho hiệu ứng --- */
         #confetti-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1000; pointer-events: none;
         }
         
-        /* --- HÒM THƯ --- */
-        .mailbox-container {
-            position: absolute;
-            cursor: pointer;
-            transition: transform 0.8s 0.5s ease-in-out, opacity 0.8s 0.5s ease-in-out; /* Thêm delay cho hiệu ứng biến mất */
-            z-index: 20;
+        /* --- MÀN CHÀO HỎI VỚI MÈO --- */
+        #intro-scene {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #fff0f5, #ffe4e1);
+            z-index: 100;
+            transition: opacity 1s ease-in-out;
         }
-        .mailbox {
+        #intro-scene.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .cat-character {
+            width: 250px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .speech-bubble {
             position: relative;
-            width: 200px;
-            height: 250px;
-        }
-        .mailbox-body {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 160px;
-            height: 120px;
-            background: #f4a5c5;
-            border-radius: 10px;
-            border: 5px solid #fff;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .mailbox-door {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            width: 70px;
-            height: 50px;
-            background: #fff;
-            border-radius: 5px;
-            transform-origin: right;
-            transition: transform 0.5s ease;
-        }
-        /* Style khi cửa mở */
-        .mailbox-container.door-opened .mailbox-door {
-            transform: rotateY(-110deg);
-        }
-        .mailbox-post {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 130px;
-            background: #e91e63;
-        }
-        .mailbox-top {
-            position: absolute;
-            top: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 180px;
-            height: 20px;
-            background: #e91e63;
-            border-radius: 10px 10px 0 0;
-        }
-        .prompt-text {
+            background: #ffffff;
+            border-radius: .4em;
+            padding: 15px 20px;
+            margin-top: 20px;
+            max-width: 80%;
             text-align: center;
-            margin-top: 10px;
             font-size: 18px;
             font-weight: 700;
             color: #c2185b;
-            transition: opacity 0.3s;
-            animation: bounce 2s infinite;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-10px);}
-            60% {transform: translateY(-5px);}
-        }
-        /* Style khi hòm thư biến mất */
-        .mailbox-container.vanished {
-            transform: scale(0);
-            opacity: 0;
-            pointer-events: none;
-        }
-        .mailbox-container.vanished .prompt-text {
-            opacity: 0;
-        }
-
-
-        /* --- PHONG BÌ --- */
-        .envelope-wrapper {
+        .speech-bubble:after {
+            content: '';
             position: absolute;
-            cursor: pointer;
-            z-index: 10;
-            transform: scale(0);
-            opacity: 0;
-            transition: transform 0.8s 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.5s 0.7s ease;
+            top: 0;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border: 20px solid transparent;
+            border-bottom-color: #ffffff;
+            border-top: 0;
+            margin-left: -20px;
+            margin-top: -20px;
         }
-        .envelope-wrapper.visible {
-            transform: scale(1);
-            opacity: 1;
-        }
-        .envelope {
-            position: relative;
-            width: 320px;
-            height: 210px;
-            background-color: #f8c8dc;
-            border-radius: 10px;
-        }
-        .envelope::before, .envelope::after {
-            content: ''; position: absolute; width: 0; height: 0; border-style: solid;
-        }
-        .envelope::before { border-width: 105px 160px; border-color: #f8c8dc transparent transparent transparent; top: 105px;}
-        .envelope::after { border-width: 105px 160px; border-color: transparent transparent #f4a5c5 transparent; bottom: 105px;}
-        
-        .flap {
-            position: absolute; top: 0; left: 0; width: 100%; height: 105px; background-color: #f4a5c5;
-            transform-origin: top; transition: transform 0.6s 0.2s ease-in-out; border-top-left-radius: 10px; border-top-right-radius: 10px;
-        }
-        .letter {
-            position: absolute; top: 0; left: 0; right: 0; background: white; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.6s 0.2s ease-in-out, box-shadow 0.6s 0.2s ease-in-out; padding: 10px; border-radius: 10px;
-        }
-        .envelope-wrapper.open .flap { transform: rotateX(180deg); }
-        .envelope-wrapper.open .letter { transform: translateY(-120px) scale(1.1); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); z-index: 5;}
-        .envelope-wrapper.open { pointer-events: none; }
 
+
+        /* --- KHUNG BAO THIỆP MỜI --- */
+        #invitation-wrapper {
+            position: relative;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 1s 0.5s ease, transform 1s 0.5s ease;
+            pointer-events: none;
+            z-index: 50;
+        }
+        #invitation-wrapper.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
 
         /* --- NỘI DUNG THIỆP MỜI --- */
-        .invitation-card { color: #5d4037; text-align: center; padding: 20px; }
+        .invitation-card { 
+            background: white;
+            color: #5d4037; 
+            text-align: center; 
+            padding: 30px; 
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            width: 380px;
+            max-width: 90vw;
+        }
         .header .icon { font-size: 40px; color: #e91e63; }
-        .header h2 { font-weight: 500; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #d81b60; margin: 10px 0 0 0;}
+        .header h2 { font-weight: 500; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #d81b60; margin: 5px 0 0 0;}
         .header h1 { font-weight: 700; font-size: 20px; margin: 0; }
-        .graduate-name { font-family: 'Dancing Script', cursive; font-size: 42px; color: #c2185b; margin: 10px 0 15px 0;}
-        .invitation-body p { font-size: 14px; line-height: 1.6; margin: 0; }
+        
+        .graduate-photo {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f4a5c5;
+            margin: 15px auto 5px auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .graduate-name { font-family: 'Dancing Script', cursive; font-size: 48px; color: #c2185b; margin: 5px 0 15px 0;}
+        .invitation-body p { font-size: 15px; line-height: 1.6; margin: 0; }
         .greeting { font-weight: 700; margin-bottom: 10px !important; }
-        .divider { border: 0; height: 1px; background: #f48fb1; margin: 20px 0; }
-        .info-block h3 { margin: 0 0 10px 0; font-size: 16px; font-weight: 700; color: #ad1457; }
-        .info-block p, .info-block div { font-size: 13px; }
-        .date-time-grid { display: flex; justify-content: space-around; align-items: center; font-weight: 500;}
+        .divider { border: 0; height: 1px; background: #f48fb1; margin: 25px auto; width: 80%; }
+        .info-block h3 { margin: 0 0 15px 0; font-size: 18px; font-weight: 700; color: #ad1457; }
+        
+        .date-time-grid {
+            display: flex; justify-content: center; align-items: center; gap: 20px; font-weight: 500;
+        }
+        .grid-divider { width: 1px; height: 40px; background-color: #f8c8dc; }
         .date-number { font-size: 32px; font-weight: 700; color: #c2185b; line-height: 1;}
-        .location strong { display: block; margin-bottom: 4px; font-size: 14px; }
-        .closing-note { margin-top: 20px; font-style: italic; font-size: 14px; color: #d81b60; }
 
+        .location-link {
+            color: #5d4037; text-decoration: none; font-weight: 700; transition: color 0.3s;
+        }
+        .location-link:hover { color: #e91e63; }
+        .location-link i { font-size: 0.8em; margin-left: 5px; }
+        .location p { margin: 5px 0 0 0; font-size: 14px; }
     </style>
 </head>
 <body>
     <canvas id="confetti-canvas"></canvas>
 
-    <!-- Hòm thư -->
-    <div class="mailbox-container" id="mailbox">
-        <div class="mailbox">
-            <div class="mailbox-post"></div>
-            <div class="mailbox-body">
-                <div class="mailbox-door"></div>
-            </div>
-            <div class="mailbox-top"></div>
+    <!-- Màn chào hỏi ban đầu -->
+    <div id="intro-scene">
+        <img src="https://i.imgur.com/L12YLf3.png" alt="Chú mèo dễ thương" class="cat-character">
+        <div class="speech-bubble">
+            HEY! Bạn có 01 bức thư<br>đến từ Hương Quỳnh xinh gái!
         </div>
-        <p class="prompt-text">Bạn có thư!</p>
     </div>
+    
+    <!-- Thiệp mời (ban đầu bị ẩn) -->
+    <div id="invitation-wrapper">
+        <div class="invitation-card">
+            <header class="header">
+                <div class="icon"><i class="fas fa-graduation-cap"></i></div>
+                <h2>Trân trọng kính mời</h2>
+                <h1>Tham dự Lễ Tốt Nghiệp</h1>
+            </header>
+            
+            <!-- THAY LINK ẢNH CỦA BẠN VÀO ĐÂY -->
+            <img src="https://i.imgur.com/Neqa85z.jpg" alt="Ảnh người tốt nghiệp" class="graduate-photo">
 
-    <!-- Phong bì và Thiệp mời -->
-    <div class="envelope-wrapper" id="envelope">
-        <div class="envelope">
-            <div class="letter">
-                <div class="invitation-card">
-                    <header class="header">
-                        <div class="icon"><i class="fas fa-graduation-cap"></i></div>
-                        <h2>Trân trọng kính mời</h2>
-                        <h1>Tham dự Lễ Tốt Nghiệp</h1>
-                    </header>
-                    <p class="graduate-name">Đỗ Hương Quỳnh</p>
-                    <div class="invitation-body">
-                        <p class="greeting">Dear: Long ❤️</p>
-                        <p>Mình rất mong bạn có thể đến chung vui và chia sẻ khoảnh khắc ý nghĩa này cùng mình.</p>
+            <p class="graduate-name">Đỗ Hương Quỳnh</p>
+
+            <div class="invitation-body">
+                <p class="greeting">Dear: Long ❤️</p>
+                <p>Mình rất mong bạn có thể đến chung vui và chia sẻ khoảnh khắc ý nghĩa này cùng mình.</p>
+            </div>
+
+            <hr class="divider">
+            
+            <div class="info-block">
+                <h3>Thời Gian</h3>
+                <div class="date-time-grid">
+                    <div>Thứ 7</div>
+                    <div class="grid-divider"></div>
+                    <div>
+                        <div class="date-number">23</div>
+                        <div>Tháng 8, 2025</div>
                     </div>
-                    <hr class="divider">
-                    <div class="info-block">
-                        <h3>Thời Gian</h3>
-                        <div class="date-time-grid">
-                            <div>Thứ 7</div>
-                            <div>
-                                <div class="date-number">23</div>
-                                <div>Tháng 8, 2025</div>
-                            </div>
-                            <div>09:00 AM</div>
-                        </div>
-                    </div>
-                    <hr class="divider">
-                    <div class="info-block location">
-                        <h3><i class="fas fa-map-marker-alt"></i> Địa Điểm</h3>
-                        <p><strong>Trường Đại học Kinh tế Quốc dân</strong></p>
-                        <p>207 Giải Phóng, Đồng Tâm, Hai Bà Trưng, Hà Nội</p>
-                    </div>
-                    <p class="closing-note">Sự hiện diện của bạn là niềm vui lớn của mình!</p>
+                    <div class="grid-divider"></div>
+                    <div>09:00 AM</div>
                 </div>
             </div>
-            <div class="flap"></div>
+
+            <hr class="divider">
+            
+            <div class="info-block location">
+                <h3><i class="fas fa-map-marker-alt"></i> Địa Điểm</h3>
+                <a href="https://maps.app.goo.gl/9T8yA8h3y2mU2qW1A" target="_blank" class="location-link">
+                    <strong>Trường Đại học Kinh tế Quốc dân <i class="fas fa-external-link-alt"></i></strong>
+                </a>
+                <p>207 Giải Phóng, Đồng Tâm, Hai Bà Trưng, Hà Nội</p>
+            </div>
         </div>
     </div>
+    
+    <!-- Audio -->
+    <audio id="notification-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_1821a11b65.mp3" preload="auto"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
-        const mailbox = document.getElementById('mailbox');
-        const envelope = document.getElementById('envelope');
+        window.onload = () => {
+            const introScene = document.getElementById('intro-scene');
+            const invitationWrapper = document.getElementById('invitation-wrapper');
+            const notificationSound = document.getElementById('notification-sound');
 
-        // Bước 1: Nhấn vào hòm thư
-        mailbox.addEventListener('click', () => {
-            // 1. Thêm class để MỞ CỬA hòm thư
-            mailbox.classList.add('door-opened');
-            
-            // 2. Sau khi cửa đã mở (khoảng 0.5s), thêm class để LÀM BIẾN MẤT hòm thư
+            // Phát âm thanh ngay khi tải trang (có thể bị chặn bởi trình duyệt, nhưng vẫn nên thử)
+            notificationSound.play().catch(error => {
+                console.log("Autoplay was prevented. User interaction might be needed.");
+            });
+
+            // Sau 5 giây, chuyển cảnh
             setTimeout(() => {
-                mailbox.classList.add('vanished');
-            }, 500);
+                // Làm mờ màn chào hỏi
+                introScene.classList.add('hidden');
 
-            // 3. Cùng lúc hòm thư bắt đầu biến mất, kích hoạt để phong bì HIỆN RA
-            setTimeout(() => {
-                envelope.classList.add('visible');
-            }, 500); 
-        });
+                // Hiển thị thiệp mời
+                invitationWrapper.classList.add('visible');
 
-        // Bước 2: Nhấn vào phong bì để mở thư
-        envelope.addEventListener('click', () => {
-            envelope.classList.add('open');
-            setTimeout(launchConfetti, 800);
-        });
+                // Tung hoa ăn mừng
+                launchConfetti();
+
+            }, 5000); // 5000 milliseconds = 5 giây
+        };
 
         function launchConfetti() {
             const canvas = document.getElementById('confetti-canvas');
@@ -276,10 +246,7 @@
                     particleCount: 2, angle: 90, spread: 360, ticks: 200, origin: { y: 0.6 },
                     shapes: ['text'], shapeOptions: { text: { value: flowers, size: 30 } }, scalar: 2
                 });
-
-                if (Date.now() < end) {
-                    requestAnimationFrame(frame);
-                }
+                if (Date.now() < end) { requestAnimationFrame(frame); }
             }());
         }
     </script>
